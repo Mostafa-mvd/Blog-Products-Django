@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="row pb-lg-4">
+            {% for object in object_list %}
+                <div class="col-4">
+                    <div class="card mb-lg-4 mt-lg-4" style="width: 18rem;">
+
+                        {% if object.product_image %}
+                            <img src="{{ object.product_image.url }}" alt="" class="img-thumbnail"
+                                 style="height: 200px;">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.png' %}" class="img-thumbnail" alt="">
+                        {% endif %}
+
+                        <div class="card-body" dir="rtl">
+                            <h5 class="card-title">{{ object.name }}</h5>
+
+                            <h6 class="card-subtitle mb-2 text-muted">محصول به
+                                تعداد {{ object.qty_in_stock }} عدد موجود است</h6>
+
+                            <p class="card-text">{{ object.description }}</p>
+
+                            <button class="btn btn-dark">
+                                <a style="text-decoration: none;color: white;"
+                                   href="{% url "store:add_to_cart" object.id %}">
+                                    🧺 سفارش
+                                </a>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% include "paginator.html" %}
+        </div>
+    </div>
+{% endblock %}

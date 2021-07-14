@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load mytags %}
+{% load humanize %}
+{% get_current_language_bidi as bidi %}
+
+{% block content %}
+    <div class="container">
+        <h1 dir="rtl">
+            <i class="fa fa-shopping-basket text-danger"></i>
+            سفارش های من
+        </h1>
+        <div class="ms-lg-5 mx-lg-5 mt-3" style="margin-bottom: 200px;">
+            <table class="table table-bordered table-striped text-center"
+                    {% if request.LANGUAGE_CODE == 'fa' %}
+                   dir="rtl"
+                    {% endif %}>
+                <thead>
+                <tr>
+                    <th>{% trans 'QtyInStock' %}</th>
+                    <th>{% trans 'DataTime' %}</th>
+                    <th>{% trans 'Status' %}</th>
+                    <th>{% trans 'Product' %}</th>
+                    <th>{% trans 'Bought Number' %}</th>
+                    <th>{% trans "Price" %}</th>
+                    <th>{% trans 'Total Cost' %}</th>
+                    <th>{% trans 'Reciept' %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for order_obj in object_list %}
+                    <tr>
+                        <td>{{ order_obj.pk }}</td>
+                        {# {{ order_obj.created_on.date }} , {{ order_obj.created_on.hour }}:{{ order_obj.created_on.minute }}:{{ order_obj.created_on.second }} #}
+                        {# {{ order_obj.get_formatted_time }} #}
+                        {# {{ order_obj.created_on|jdate:"%Y-%m-%d, %H:%M:%S" }} #}
+                        {# {{ order_obj.created_on|naturalday }} #}
+                        <td>{{ order_obj.formatted_date }}</td>
+                        <td>{% trans order_obj.get_status_display %}</td>
+                        <td dir="rtl">
+                            <!-- related_on_item --> <!-- OrderItem Object -->
+                            {% for item in  order_obj.orderitem_set.all %}
+                                {{ forloop.counter }} - {{ item.product.name }} * {{ item.qty }} <br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% with order_obj.get_total_qty as total_qty %}
+                                {% if total_qty %}
+                                    {{ total_qty }}
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            {% for item in  order_obj.orderitem_set.all %}
+                                {{ item.product.price }}<br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {{ order_obj.get_grand_total }}
+                            ریال
+                        </td>
+                        <td>
+                            <a href="{% url 'store:receipt' order_obj.pk %}" type="button">
+                                <i class="fa fa-print"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% include "paginator.html" %}
+        </div>
+    </div>
+{% endblock %}

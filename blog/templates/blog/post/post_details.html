@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <div style="padding-right: 25%; padding-left: 25%;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex">
+                        <h3 style="size: 2px;">{{ object.title }}</h3>
+                        <a href="{% url "blog:edit_post" pk=post.id %}" class="float-left">
+                            {% if request.user.is_authenticated %}
+                                {% if request.user == post.creator %}
+                                    <img src="https://img.icons8.com/cute-clipart/25/000000/edit.png" alt=""/>
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <strong class="text-muted">At {{ object.created_time }} By {{ object.creator }}</strong>
+            <p style="size: 30px;" class="pt-4">{{ object.body }}</p>
+            {% if object.image %}
+                <img src="{{ object.image.url }}" alt="" class="pb-5 w-100 h-50">
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

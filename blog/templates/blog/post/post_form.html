@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+
+{% block  title %}
+    : {{ page_title }}
+{% endblock %}
+
+
+{% block content %}
+    <h3 class="p-lg-4">{{ page_title }}</h3>
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <div class="form-group p-lg-4">
+            <label for="title">Title</label>
+            {{ form.title|add_class:"form-control" }}
+            <!-- <input name="title" id="title" class="form-control" type="text" value="{{ form.initial.title }}"> -->
+        </div>
+
+        <div class="form-group p-lg-4">
+            <label for="body">Content</label>
+            {{ form.body|add_class:"form-control"|attr:"cols:50"|attr:"rows:10"|attr:'style:resize: none' }}
+            <!-- <textarea name="body" id="body" class="form-control" cols="50" rows="10"
+                      style="resize: none">{{ form.initial.body }}</textarea> -->
+        </div>
+
+        <!--
+        <div class="form-group p-lg-4">
+            <label for="creator">Creator</label>
+            <select id="creator" name="creator" class="form-control">
+                <option value="1">Mostafa</option>
+                <option value="2">Hamed</option>
+            </select>
+        </div>
+        -->
+
+        <div class="form-group p-lg-4">
+            {{ form.image }}
+        </div>
+
+        <!--
+        <div class="form-group p-lg-4">
+            <label for="category">Category</label>
+            <select id="category" name="category" class="form-control">
+                <option value="1">PC</option>
+                <option value="2">Python</option>
+                <option value="3">Linux</option>
+                <option value="4">Movie</option>
+            </select>
+        </div>
+        -->
+
+        <div class="ms-lg-4">
+            {{ form.category }}
+        </div>
+
+        <div class="p-lg-4">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+{% endblock %}

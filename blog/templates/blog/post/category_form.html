@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3 class="p-lg-4">{{ page_title }}</h3>
+
+    <form method="post">
+        {% csrf_token %}
+        {% with form.name as field %}
+        <div class="form-group p-lg-4">
+            <label for="{{ field.auto_id }}">Category Name</label>
+            {{ field.name }}
+            <input name="{{ field.name }}" id="{{ field.auto_id }}" class="form-control" type="text" value="{{ form.initial.name }}">
+        </div>
+        {% endwith %}
+
+        {% with form.slug as field %}
+        <div class="form-group p-lg-4">
+            <label for="{{ field.auto_id }}">Slug</label>
+            <input name="{{ field.name }}" id="{{ field.auto_id }}" class="form-control" type="text" value="{{ form.initial.slug }}">
+        </div>
+        {% endwith %}
+
+        <div class="p-lg-4">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+{% endblock %}

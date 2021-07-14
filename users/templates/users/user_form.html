@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {% with form.first_name as field %}
+            <div class="form-group p-lg-4">
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                <input name="{{ field.name }}" id="{{ field.auto_id }}" class="form-control" type="text"
+                       value="{{ form.initial.first_name }}">
+                {{ field.errors }}
+            </div>
+        {% endwith %}
+
+        {% with form.last_name as field %}
+            <div class="form-group p-lg-4">
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                <input name="{{ field.name }}" id="{{ field.auto_id }}" class="form-control" type="text"
+                       value="{{ form.initial.last_name }}">
+                {{ field.errors }}
+            </div>
+        {% endwith %}
+
+        {% with form.email as field %}
+            <div class="form-group p-lg-4">
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                <input name="{{ field.name }}" id="{{ field.auto_id }}" class="form-control" type="email" placeholder="example@local.com"
+                       value="{{ form.initial.email }}">
+                {{ field.errors }}
+            </div>
+        {% endwith %}
+
+        <div class="p-lg-4">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+{% endblock %}

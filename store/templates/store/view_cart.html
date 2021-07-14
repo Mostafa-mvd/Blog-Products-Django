@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="text-center" style="margin-left: 300px; margin-right: 300px;">
+        <table class="table table-secondary table-striped table-bordered border-primary">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>product's name</th>
+                <th>number</th>
+                <th>delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in object_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.product }}</td>
+                    <td>
+                        <a class="deduct-btn btn btn-sm rounded btn-light" href="#"
+                           data-product-id="{{ item.product.id }}">➖</a>
+                        <span class="qty">{{ item.qty }}</span>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm" href="{% url "store:delete_from_cart" item.product.id %}">❌</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">basket is empty.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if object_list %}
+            <button class="btn btn-primary">
+                <a href="{% url "store:finalized_order" %}" style="text-decoration: none; color: white;">ثبت سفارش شما</a>
+            </button>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block page_scripts %}
+    <script>
+        $(document).ready(
+            function () {
+                $('a.deduct-btn').click(
+                    function (event) {
+                        // debugger;
+                        const productId = event.currentTarget.dataset.productId;
+
+                        $.ajax(
+                            {
+                                url: "{% url 'store:decrease_product_number' %}",
+                                method: 'POST',
+                                data:
+                                    {
+                                        product_id: productId
+                                    },
+                                success: function (response) {
+                                    let qty_span = $(event.currentTarget).next()[0];
+                                    // qty_span.innerHTML = response['qty'];
+                                    $(qty_span).html(response['qty']);
+                                },
+                                error: function (response) {
+                                    alert(response['status']);
+                                }
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    </script>
+{% endblock %}

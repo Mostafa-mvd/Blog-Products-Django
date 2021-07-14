@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mb-5">
+            {% for post in object_list %}
+                <div class="col-md-4">
+                    <div>
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="" class="img-thumbnail w-100" style="height: 250px;">
+                        {% else %}
+                            <img src="{% static "img/placeholder.png" %}" alt="" class="img-thumbnail w-100"
+                                 style="height: 250px;">
+                        {% endif %}
+                    </div>
+                    <div class="d-flex">
+                        <a style="text-decoration: none;" href="{% url 'blog:post_detail' pk=post.id %}"
+                           class="d-inline-block mb-2 text-primary">{{ post.title }}</a>
+                        <a href="{% url "blog:edit_post" pk=post.id %}" class="float-left">
+                            {% if request.user.is_authenticated %}
+                                {% if request.user == post.creator %}
+                                    <img src="https://img.icons8.com/cute-clipart/25/000000/edit.png" alt=""/>
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </div>
+
+                    <div class="mb-1 text-muted">At {{ post.created_time }} By {{ post.creator }}</div>
+                    <div><strong class="text-dark">{{ post.category }}</strong></div>
+                    <p class="text-justify">{{ post.body | truncatechars:80 }}</p>
+
+                    <!-- Like button -->
+                    <div class="row pt-3 pb-3">
+
+                        <!--
+                        href= "{# {% url "blog:like_of_post" id=post.id %} #}"
+                        <span id="like-count-{# {{ post.like }} #}-with-{# {{ post_id }} #}">{# {{ post.like }} #}</span>
+                        <span id="dislike-count-{# {{ post.dislike }} #}-with-{# {{ post_id }} #}">{# {{ post.dislike }} #}</span>
+                        -->
+
+                        <div class="col-6">
+                            <a class="btn btn-outline-dark like-btn ps-lg-5 d-flex justify-content-center"
+                               data-post-id="{{ post.id }}" data-like-count="{{ post.like }}" data-button="1"
+                                    {% if post.like_btn_clicked %}
+                               style="color: blue;"
+                                    {% else %}
+                               style="color: red;"
+                                    {% endif %}
+                            >
+                                👍 <span id="like-{{ post.id }}">{{ post.like }}</span>
+                            </a>
+                        </div>
+
+                        <div class="col-6">
+                            <a class="btn btn-outline-dark dislike-btn ps-lg-5 d-flex justify-content-center"
+                               data-post-id="{{ post.id }}" data-dislike-count="{{ post.dislike }}" data-button="0"
+                                    {% if post.dislike_btn_clicked %}
+                               style="color: blue;"
+                                    {% else %}
+                               style="color: red;"
+                                    {% endif %}
+                            >
+                                👎 <span id="dislike-{{ post.id }}">{{ post.dislike }}</span>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+            {% include "paginator.html" %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_scripts %}
+    <script>
+        $(document).ready(function () {
+            $(".like-btn, .dislike-btn").click(function (event) {
+
+                const post_id = $(event.currentTarget)[0].dataset.postId;
+                const btn_type = $(event.currentTarget)[0].dataset.button;
+                let url;
+
+                if (btn_type === "1") {
+                    url = "/blog/like/" + post_id + "/";
+                } else {
+                    url = "/blog/dislike/" + post_id + "/";
+                }
+
+
+                // let like_count = $(event.currentTarget)[0].dataset.likeCount;
+                // let dislike_count = $(event.currentTarget)[0].dataset.dislikeCount;
+
+                /*
+                console.log($(event))
+                console.log($(event.currentTarget))
+                console.log(post_id)
+                console.log(like_count)
+                */
+
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    /*
+                    data: {btn_type: btn_type},
+                    dataType: 'json',
+                     */
+                    success: function (response) {
+
+                        /*
+                        console.log(response)
+                        console.log(like_numbers)
+                        */
+
+                        if (response['result']) {
+                            let like_numbers = response["number_of_likes"];
+                            let dislike_numbers = response["number_of_dislikes"];
+
+                            // let like_selector = 'span#like-count-' + like_count + '-with-' + post_id + '-id';
+                            // let dislike_selector = 'span#dislike-count-' + dislike_count + '-with-' + post_id + '-id';
+
+                            let like_selector = $("span#like-" + post_id);
+                            let dislike_selector = $("span#dislike-" + post_id);
+                            like_selector.html(like_numbers);
+                            dislike_selector.html(dislike_numbers);
+
+
+                            if (btn_type === "1") {
+                                if (!response["like_btn_clicked"]) {
+                                    like_selector.css("color", "red");
+                                } else {
+                                    like_selector.css("color", "blue");
+                                }
+
+                                dislike_selector.css("color", "red");
+                            } else {
+                                if (!response["dislike_btn_clicked"]) {
+                                    dislike_selector.css("color", "red");
+                                } else {
+                                    dislike_selector.css("color", "blue");
+                                }
+
+                                like_selector.css("color", "red");
+                            }
+                        } else {
+                            alert("\n\nYOU HAVE TO LOGIN FIRST.");
+                        }
+                    },
+                });
+            });
+        });
+    </script>
+{% endblock %}

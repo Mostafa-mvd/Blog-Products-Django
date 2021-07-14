@@ -1,0 +1,9 @@
+Django==3.2.5
+django-jalali==4.1.2
+django-taggit==1.4.0
+jdatetime==3.6.2
+Pillow==8.2.0
+djangorestframework~=3.12.4
+pymemcache
+django-widget-tweaks
+weasyprint

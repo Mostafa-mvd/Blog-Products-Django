@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for category_in_post in object_list %}
+        <div class="pb-5 ps-3">
+            <a href="{% url "blog:post_detail" category_in_post.id %}" style="text-decoration: none;">{{ category_in_post.title }}</a>
+            <p>{{ category_in_post.body| truncatewords:20 }}</p>
+            <strong class="text-muted">At {{ category_in_post.created_time }} By {{ category_in_post.creator }}</strong>
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -9,7 +9,8 @@ from django.views.generic import UpdateView
 from datetime import datetime
 from users.forms import LoginForm
 import logging
-
+from rest_framework import serializers, viewsets, permissions
+from . import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -59,3 +60,10 @@ class EditUserProfile(LoginRequiredMixin, UpdateView):
     # It returns an object (an instance of your model)
     def get_object(self, queryset=None):
         return self.request.user
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = get_user_model().objects.all()
+    serializer_class = serializers.UsersSerializer
+    permission_classes = [permissions.IsAuthenticated]
+

@@ -11,13 +11,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView
 import inventory.models
-from inventory import models
-from rest_framework import viewsets
+from inventory import models, views
+from rest_framework import status, viewsets
 from store import models as store_models
 from store import serializers
+from store import permissions as store_permissions
 from store.permissions import IsCustomerOrReadOnly
 from store.models import OrderItem, Order
 from rest_framework.exceptions import NotAuthenticated
+from rest_framework import permissions as rest_presmissions
+from rest_framework.decorators import action
 # from rest_framework import permissions
 
 
@@ -157,7 +160,7 @@ REST API View
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = store_models.Order.objects.all()
     serializer_class = serializers.OrderSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [store_permissions.IsAuthenticatedOrReadOnly]
     permission_classes = [IsCustomerOrReadOnly]
 
     #filter with your queryset class attr
@@ -172,6 +175,14 @@ class OrderViewSet(viewsets.ModelViewSet):
             raise NotAuthenticated("You are not authenticated")
         # return qs.filter(customer=self.request.user)
         return qs.filter_by_customer(self.request.user)
+
+
+    @action(detail=True, description="Cancel An Order")
+    def cancel_order(self, request, *args, **kwargs):
+        order_instance = self.get_object()
+        order_instance.set_as_canceled()
+        order_serializer = self.get_serializer(instance=order_instance)
+        return JsonResponse(order_serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
 @login_required
@@ -227,4 +238,10 @@ class PrintOrderView(LoginRequiredMixin, DetailView):
         receipt_pdf = weasyprint.HTML(string=content).write_pdf()
         response = HttpResponse(receipt_pdf, content_type='application/pdf')
         return response
+
+
+class OrderItemsViewSets(viewsets.ModelViewSet):
+    queryset = OrderItem.objects.all()
+    serializer_class = serializers.OrderItemsSerializer
+    permission_classes = [rest_presmissions.IsAuthenticated, store_permissions.IsCustomerOrReadOnlyForOrderItems]
 

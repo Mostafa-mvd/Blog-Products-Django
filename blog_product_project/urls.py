@@ -21,6 +21,16 @@ from django.shortcuts import redirect
 from django.urls import path, include
 import debug_toolbar
 
+from users import views as users_views
+from store import views as store_views
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r"show-users", users_views.UserViewSet)
+router.register(r"show-orders", store_views.OrderViewSet)
+router.register(r"show-orderitems", store_views.OrderItemsViewSets)
+
+
 urlpatterns = [
     path("blog/", include("blog.urls", namespace="blog")),
     path("inventories/", include("inventory.urls", namespace="inventories")),
@@ -29,6 +39,7 @@ urlpatterns = [
     path('admin/logout/', lambda request: redirect('users:logout_user', permanent=False)),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
+    path('api/v1/', include(router.urls)),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
